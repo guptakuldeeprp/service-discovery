@@ -37,7 +37,7 @@ public class DiscoveryManager<T> {
 
 
     public static <T> DiscoveryManager getInstance(Class<T> metadataClass) {
-        return new DiscoveryManager(metadataClass);
+        return new DiscoveryManager<T>(metadataClass);
     }
 
     private DiscoveryManager(Class<T> metadataClass) {
@@ -50,6 +50,7 @@ public class DiscoveryManager<T> {
     }
 
     public DiscoveryClient<T> getDiscoveryClient() {
+
         discoveryClientAtomicReference.compareAndSet(null, DiscoveryClient.<T>getInstance(metadataClass, configuration.getString(CONN_STR, "localhost:2181"), configuration.getString(SRVC_BASEPATH, "/discovery/dev"), new ExponentialBackoffRetry(1000, 3)).start());
         return discoveryClientAtomicReference.get();
     }
@@ -81,8 +82,12 @@ public class DiscoveryManager<T> {
     private ServiceMetadata getThisServiceMetadata() {
         ServiceMetadata metadata = new ServiceMetadata();
         metadata.setDescription(configuration.getString(SRVC_DESC, ""));
-        metadata.addTenants(configuration.getStringArray(SRVC_TENANTS));
-        metadata.addTags(configuration.getStringArray(SRVC_TAGS));
+        String tenantsStr = configuration.getString(SRVC_TENANTS);
+        if (tenantsStr != null)
+            metadata.addTenants(tenantsStr.split(","));
+        String tagsStr = configuration.getString(SRVC_TAGS);
+        if (tagsStr != null)
+            metadata.addTags(tagsStr.split(","));
         Configuration labelConf = configuration.subset(SRVC_LABELS);
         if (labelConf != null) {
             Iterator<String> keyItr = labelConf.getKeys();

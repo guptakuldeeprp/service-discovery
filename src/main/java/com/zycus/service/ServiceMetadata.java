@@ -5,6 +5,7 @@ import java.util.*;
 public class ServiceMetadata {
 
     private String description = "";
+
     private List<String> tenants = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
     private Map<String, Object> labels = new HashMap<>();

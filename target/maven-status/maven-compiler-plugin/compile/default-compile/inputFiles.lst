@@ -14,7 +14,9 @@ D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discove
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\strategy\SelectorStrategy.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\api\impl\ServiceQueryBuilder.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\filter\ServiceFilter.java
+D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\client\DemoClient.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\DiscoveryManager.java
+D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\client\TenantFilter.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\api\ServiceRegistration.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\strategy\factory\SimpleStrategyFactory.java
 D:\monitoring\intellij\service-discovery\src\main\java\com\zycus\service\discovery\ServiceDiscoveryConfig.java

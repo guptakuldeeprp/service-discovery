@@ -9,6 +9,7 @@ import com.zycus.service.discovery.strategy.SelectorStrategy;
 import com.zycus.service.discovery.strategy.factory.StrategyFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceProvider;
 
 import java.io.IOException;
@@ -26,15 +27,15 @@ public class ServiceQueryImpl<T> implements ServiceQuery<T> {
     private ServiceFilter<T> defaultServiceFilter;
     private StrategyFactory<? extends SelectorStrategy<T>> defaultStrategyFactory;
     private DiscoveryClient<T> discoveryClient;
-    private LoadingCache<String, ServiceProvider<T>> cacheInstance;
+    private Cache<String, ServiceProvider<T>> cacheInstance;
 
-    ServiceQueryImpl(final ServiceFilter<T> defaultServiceFilter, final StrategyFactory<? extends SelectorStrategy<T>> defaultSelectorStrategy, final DiscoveryClient<T> discoveryClient) {
+    ServiceQueryImpl(final ServiceFilter<T> defaultServiceFilter, final StrategyFactory<? extends SelectorStrategy<T>> defaultStrategyFactory, final DiscoveryClient<T> discoveryClient) {
 
         System.out.println("defaultServiceFilter: " + defaultServiceFilter);
-        System.out.println("defaultSelectorStrategy: " + defaultSelectorStrategy);
+        System.out.println("defaultSelectorStrategy: " + defaultStrategyFactory);
         System.out.println("discoveryClient: " + discoveryClient);
         this.defaultServiceFilter = defaultServiceFilter;
-        this.defaultStrategyFactory = defaultSelectorStrategy;
+        this.defaultStrategyFactory = defaultStrategyFactory;
         this.discoveryClient = discoveryClient;
         cacheInstance = CacheBuilder.<String, ServiceProvider<T>>newBuilder().softValues().removalListener(new RemovalListener<String, ServiceProvider<T>>() {
 
@@ -46,19 +47,20 @@ public class ServiceQueryImpl<T> implements ServiceQuery<T> {
                     logger.warn("Internal error while closing ServiceProvider: " + e.getLocalizedMessage());
                 }
             }
-        }).build(new CacheLoader<String, ServiceProvider<T>>() {
-            @Override
-            public ServiceProvider<T> load(String key) throws Exception {
-                ServiceProvider<T> provider = discoveryClient.getServiceDiscovery()
-                        .serviceProviderBuilder()
-                        .serviceName(key)
-                        .additionalFilter(wrap(defaultServiceFilter))
-                        .providerStrategy(wrap(defaultStrategyFactory.getStrategy()))
-                        .build();
-                provider.start();
-                return provider;
-            }
-        });
+        }).build();
+//        .build(new CacheLoader<String, ServiceProvider<T>>() {
+//            @Override
+//            public ServiceProvider<T> load(String key) throws Exception {
+//                ServiceProvider<T> provider = discoveryClient.getServiceDiscovery()
+//                        .serviceProviderBuilder()
+//                        .serviceName(key)
+//                        .additionalFilter(wrap(defaultServiceFilter))
+//                        .providerStrategy(wrap(defaultStrategyFactory.getStrategy()))
+//                        .build();
+//                provider.start();
+//                return provider;
+//            }
+//        });
 
     }
 
@@ -105,21 +107,22 @@ public class ServiceQueryImpl<T> implements ServiceQuery<T> {
                 .serviceName(serviceName)
                 //.additionalFilter(wrap(defaultServiceFilter))
                 //.providerStrategy(wrap(defaultStrategyFactory.getStrategy()))
-                //.additionalFilter(wrap(defaultServiceFilter))
+                .additionalFilter(wrap(defaultServiceFilter))
                 .providerStrategy(wrap(defaultStrategyFactory.getStrategy()))
                 .build();
         provider.start();
-        System.out.println("ServiceQueryImpl instance: " + provider.getInstance());
-        return wrap(provider.getInstance());
+        ServiceInstance<T> inst = provider.getInstance();
+        System.out.println("ServiceQueryImpl instance: " + inst);
+        return inst == null ? null : wrap(inst);
         //return wrap(cacheInstance.get(serviceName).getInstance());
         //return null;
     }
 
     @Override
     public Collection<ServiceItem<T>> getAllInstances(String serviceName) throws Exception {
-
-        return wrap(cacheInstance.get(serviceName)
-                .getAllInstances());
+        return null;
+//        return wrap(cacheInstance.get(serviceName)
+//                .getAllInstances());
     }
 
     @Override
